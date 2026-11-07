@@ -4,6 +4,12 @@ Receptor SDR para Windows com a cara de um transceptor de HF de mesa no estilo d
 
 ![IC7610SDR](IC7610SDR.png)
 
+## Vídeo
+
+[![IC7610SDR funcionando - clique para ver o vídeo](IC7610SDR.gif)](IC7610SDR.mp4)
+
+O rádio em 940 kHz (AM) com os dois S-meters, o escopo DUAL e a cachoeira. *Clique na animação para ver o vídeo completo (2 min 24 s).*
+
 ## Radar Aéreo
 
 Tela de radar em tela cheia, com a agulha girando 360°, que mostra os aviões que o dongle está ouvindo pelo **ADSB, ACARS, VDL2 e HFDL**. Mostra também as estações de terra do HFDL que transmitiram e a posição pela internet (adsb.lol) de quem foi ouvido sem posição. O alcance vai de 10 km até o planeta inteiro.
