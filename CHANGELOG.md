@@ -1,0 +1,24 @@
+# IC7610SDR - histórico
+
+## 1.0.0 (07/11/2026)
+- Primeira versão. Mesmo motor do FTdxSDR 1.0.0 / SDR990S 1.2.8 (RTL-SDR, RTL-TCP, SDRplay, todos os
+  decodificadores, Radar Aéreo, Satélites), com o painel novo no estilo do IC-7610, desenhado a partir da foto:
+  - tela com as células ANT / P.AMP / ATT / IP+ / AGC / VOX / COMP, os dois S-meters iguais aos do rádio
+    (S, Id, Po, SWR, COMP, ALC, Vd), BW / SFT / desenho do filtro / MET, relógio local e UTC, TX e DUAL-W;
+  - VFO, etiqueta azul do modo (clique escolhe), FIL1/2/3, frequência grande e a linha da memória;
+  - escopo DUAL: o do receptor ouvido e, ao lado, o do outro receptor (recortado do mesmo dongle);
+  - teclas de toque <MENU1> (EDGE, HOLD, CENT/FIX, MAIN/SUB, DUAL, EXPD/SET) e <MENU2> (NOTCH, A-NOTCH,
+    CONT, BC, DECODE, IF SCOPE);
+  - MENU, M.SCOPE, MP-W, MP-R, AUTO TUNE, QUICK, EXIT, REC e PLAY embaixo da tela;
+  - POWER, TRANSMIT, TIMER, TUNER, PHONES, ELEC-KEY, os AF-RF/SQL do MAIN e do SUB com MUTE e TX/RX, NB e NR;
+  - MULTI, teclas de banda 1.8 ... 50, GENE, SPLIT, DUAL-W, MAIN/SUB, XFC, CHANGE e o dial grande;
+  - TWIN-PBT (com CLR), FILTER, APF/TPF, KEY SPEED-PITCH, RIT, delta-TX, CLEAR, o botão RIT/delta-TX e SPEECH.
+- Botão CACHOEIRA no lugar do cartão SD (embaixo, à esquerda, ao lado do MIC): liga o espectro e a cachoeira
+  grandes em cima do rádio, ocupando a tela.
+- Sem barra de título do Windows: tampa do rádio com o nome, a versão e minimizar / maximizar / fechar;
+  fundo transparente, o rádio em pé sobre os dois pés prata.
+- Cores da cachoeira "IC-7610 (azul)" (padrão) e o espectro em linha dourada (preenchido é opção no SCOPE SET), com o ruído embaixo.
+- S-meter: o ponteiro mede o sinal acima do ruído (o ruído fica no S1-S2 e o ponteiro sobe com o sinal).
+- DUAL: escopo do MAIN à esquerda e do SUB à direita; a moldura laranja marca o receptor em uso.
+- Ícone próprio (dial prata com a tela do escopo).
+- Pés cromados escovados; nome IC7610SDR dourado no lugar da marca; LED verde na tecla NR com o NR espectral.
