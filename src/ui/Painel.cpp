@@ -1599,6 +1599,7 @@ void Ui::ativar(int i)
         r_->setMedirCanal(true);
         std::swap(fft_, fftO_);
         std::swap(suave_, suaveO_);
+        std::swap(pisoSqlA_, pisoSqlO_);
         std::swap(pisoMed_, pisoO_);
         quadrosOutro_ = 0;
         picoHold_.assign(suave_.size(), -200.f);
@@ -1885,6 +1886,12 @@ void Ui::carregarPainel()
     }
     rx_[0].f = r_->vfo(); rx_[0].modo = r_->modo();      // o MAIN e o que o radio tinha
     ativo_ = 0;
+    if (c.num("sql_rel", 0) < 1) {
+        // o squelch mudou de escala (10/11/2026: dB acima do ruido - 60): o valor antigo nao vale mais;
+        // quem tinha squelch ligado fica com 10 dB acima do ruido
+        for (auto& R : rx_) if (R.sql > -90.f) R.sql = -50.f;
+        c.set("sql_rel", 1);
+    }
     txVfo_ = (int)std::clamp(c.num("p_tx", 0), 0LL, 1LL);
     att_ = (int)std::clamp(c.num("p_att", 0), 0LL, 3LL);
     pamp_ = (int)std::clamp(c.num("p_pamp", 0), 0LL, 2LL);
@@ -2741,7 +2748,7 @@ void Ui::ladoVfo(float x, float y, float w, float h, int rx)
             texto(f_.painel, 5.2f, xi, y + 2.5f, c, t);
             xi += larguraTexto(f_.painel, 5.2f, t) + 4.f;
         };
-        const bool busy = lig && r_->aoVivo() && (at ? (sqlAberto_ && (sql_ > -90 || smAtual_ > 0.22f)) : smOutro_ > 0.30f);
+        const bool busy = lig && r_->aoVivo() && ocupadoRx(rx);
         if (busy) ind("BUSY", P_VERDE);
         if (txVfo_ == rx && txVfo_ != ativo_) ind("TX", P_VERMELHO);
         if (R.lock) ind("LOCK", P_VERMELHO);
@@ -4502,7 +4509,7 @@ void Ui::icEsquerda()
         tx(fP(), 11.5f, 447, yRot + 23, BR, "TX/RX", 0.5f, 0.94f);
         {   // LED TX/RX: verde com sinal (squelch aberto), vermelho se este e o receptor de "TX" no SPLIT
             const bool at = rx == ativo_;
-            const bool busy = lig && r_->aoVivo() && (at ? (sqlAberto_ && (R.sql > -90 || smAtual_ > 0.22f)) : smOutro_ > 0.30f);
+            const bool busy = lig && r_->aoVivo() && ocupadoRx(rx);
             const ImU32 cl = (txVfo_ == rx && txVfo_ != ativo_) ? IM_COL32(0xff, 0x40, 0x30, 255) : busy ? IM_COL32(0xd8, 0xff, 0x3c, 255) : IM_COL32(0x30, 0x32, 0x2c, 255);
             if (cl != IM_COL32(0x30, 0x32, 0x2c, 255)) dl->AddRectFilled(Q(447, yRot + 34), Q(477, yRot + 46), alfa(cl, 70), QD(5));
             dl->AddRectFilled(Q(451, yRot + 37), Q(473, yRot + 43), cl, QD(3));
@@ -4918,7 +4925,8 @@ void Ui::icVfo(int rx, float yS)
     const ImU32 W = lig ? IM_COL32(0xf4, 0xf4, 0xf6, 255) : IM_COL32(0x80, 0x82, 0x86, 255);
     const uint64_t f = at ? r_->vfo() : R.f;
     const std::string md = at ? r_->modo() : R.modo;
-    const float dv = 470.f * rx, df = 485.f * rx, ds = 483.f * rx;
+    // IC7610SDR 1.1.1: a linha do VFO do MAIN anda 30 px para a direita (os sliders AF / SQL ficam no canto)
+    const float dv = 470.f * rx + (rx == 0 ? 30.f : 0.f), df = 485.f * rx, ds = 483.f * rx;
     char b[96], id[24];
     // VFO / MEMO
     std::snprintf(b, sizeof b, "%s", R.memModo ? "MEMO" : "VFO");
@@ -4947,7 +4955,7 @@ void Ui::icVfo(int rx, float yS)
     // etiquetas pequenas do que esta ligado
     {
         float xi = 882 + dv;
-        const float xMax = rx == 0 ? 1040.f : 1550.f;
+        const float xMax = rx == 0 ? 1040.f : 1515.f;
         auto ind = [&](const char* t, ImU32 c) {
             const float w = txW(fL(), 9.f, t) + 8.f;
             if (xi + w > xMax) return;
@@ -4956,7 +4964,7 @@ void Ui::icVfo(int rx, float yS)
             xi += w + 4.f;
         };
         const ImU32 cz = IM_COL32(0xc8, 0xcc, 0xd2, 255), lr = IM_COL32(0xff, 0xa0, 0x30, 255);
-        const bool busy = lig && r_->aoVivo() && (at ? (sqlAberto_ && (R.sql > -90 || smAtual_ > 0.22f)) : smOutro_ > 0.30f);
+        const bool busy = lig && r_->aoVivo() && ocupadoRx(rx);
         if (busy) ind("BUSY", IM_COL32(0x60, 0xff, 0x70, 255));
         if (R.nb1 || R.nb2) ind(R.nb2 ? "NB2" : "NB", cz);
         if (R.nr2) ind("NR", cz);
@@ -4972,10 +4980,10 @@ void Ui::icVfo(int rx, float yS)
         if (R.fine) ind("FINE", lr);
     }
     // a frequencia
-    const float xr = 1035 + df, yc = 472 + yS, cap = 50.f;
+    const float xr = 1035 + df - (rx == 1 ? 9.f : 0.f), yc = 472 + yS, cap = 40.f;      // IC7610SDR 1.1.1: digitos menores (antes 50)
     if (entrando_ && at) {
         const std::string t = (entrada_.empty() ? std::string("_") : entrada_) + " kHz";
-        tx(fL(), 40.f, xr, yc, P_AMBAR, t.c_str(), 1.f);
+        tx(fL(), 34.f, xr, yc, P_AMBAR, t.c_str(), 1.f);
     } else {
         const std::string fs = fmtFreqLcd(f);
         const ImU32 cf = !lig ? IM_COL32(0x50, 0x52, 0x56, 255) : at ? IM_COL32(0xf6, 0xf6, 0xf6, 255) : IM_COL32(0xa8, 0xaa, 0xae, 255);
@@ -5036,7 +5044,69 @@ void Ui::icVfo(int rx, float yS)
         tx(fL(), 11.5f, 735 + ds, 507 + yS, IM_COL32(0xd8, 0xda, 0xde, 255), b, 0.5f);
         std::snprintf(b, sizeof b, "%s  %s", fm.c_str(), m.modo.c_str());
         tx(fL(), 11.5f, 768 + ds, 507 + yS, IM_COL32(0xd8, 0xda, 0xde, 255), b);
-        if (!m.nome.empty()) tx(fL(), 9.5f, 1035 + df, 507 + yS, IM_COL32(0x90, 0x94, 0x9a, 255), m.nome.c_str(), 1.f, 1.f, 120.f);
+        if (!m.nome.empty()) tx(fL(), 9.5f, xr, 507 + yS, IM_COL32(0x90, 0x94, 0x9a, 255), m.nome.c_str(), 1.f, 1.f, 120.f);
+    }
+    // IC7610SDR 1.1.1: no canto de cada VFO, dois sliders em pe - AF (volume) e SQL (squelch) daquele receptor.
+    // Valem em qualquer modo (um aparelho ou dois, qualquer modo de recepcao); os mesmos valores dos botoes AF / RF-SQL.
+    {
+        const float y0 = 400.f + yS, y1 = 517.f + yS;
+        const float xa = rx == 0 ? 650.f : 1521.f, xs = xa + 18.f, wl = 11.f;
+        const bool tocando = lig && !R.mute && !sendMudo_ && tocaRx(rx);
+        ImGuiIO& io = ImGui::GetIO();
+        auto valorDoMouse = [&]() {
+            const float ya = Q(0, y0 + 1.5f).y, yb = Q(0, y1 - 1.5f).y;
+            return std::clamp((yb - io.MousePos.y) / std::max(1.f, yb - ya), 0.f, 1.f);
+        };
+        auto trilho = [&](float x0, float tv, ImU32 cor, ImU32 marca, const char* rot) {
+            const float x1 = x0 + wl;
+            tx(fL(), 6.5f, (x0 + x1) * 0.5f, 393.f + yS, cor, rot, 0.5f);
+            dl->AddRectFilled(Q(x0, y0), Q(x1, y1), IM_COL32(0x06, 0x08, 0x0c, 255), QD(2.5f));
+            dl->AddRect(Q(x0, y0), Q(x1, y1), IM_COL32(0x50, 0x58, 0x66, 255), QD(2.5f), 0, std::max(1.f, QD(1.f)));
+            const float yv = y1 - 1.5f - std::clamp(tv, 0.f, 1.f) * (y1 - y0 - 3.f);
+            dl->AddRectFilledMultiColor(Q(x0 + 1.5f, yv), Q(x1 - 1.5f, y1 - 1.5f), alfa(cor, 255), alfa(cor, 255), alfa(cor, 110), alfa(cor, 110));
+            for (int k = 1; k < 5; ++k) { const float y = y1 - (y1 - y0) * k / 5.f; dl->AddLine(Q(x0 + 1, y), Q(x0 + 3, y), IM_COL32(0x80, 0x88, 0x96, 200), 1.f); }
+            dl->AddRectFilled(Q(x0 - 1.5f, yv - 1.6f), Q(x1 + 1.5f, yv + 1.6f), marca, QD(1));
+            ImGui::SetCursorScreenPos(Q(x0 - 3, y0 - 3));
+            return ImVec2(QD(wl + 6), QD(y1 - y0 + 6));
+        };
+        const char* qual = rx == 0 ? "MAIN" : "SUB";
+        // AF (volume)
+        {
+            const ImU32 cv = !tocando ? IM_COL32(0x60, 0x66, 0x70, 255) : IM_COL32(0x5c, 0xbe, 0xf6, 255);
+            const ImVec2 sz = trilho(xa, R.af / 100.f, cv, tocando ? IM_COL32(0xf4, 0xf4, 0xf6, 255) : IM_COL32(0x90, 0x94, 0x9a, 255), "AF");
+            std::snprintf(id, sizeof id, "##afsl%d", rx);
+            ImGui::InvisibleButton(id, sz);
+            if (ImGui::IsItemActive()) R.af = valorDoMouse() * 100.f;
+            if (ImGui::IsItemHovered()) {
+                if (io.MouseWheel != 0) { R.af = std::clamp(R.af + io.MouseWheel * 3.f, 0.f, 100.f); io.MouseWheel = 0; }
+                ImGui::SetTooltip("AF: volume do %s - %d%%%s\nArraste para cima / para baixo ou use a roda do mouse.%s", qual, (int)std::lround(R.af),
+                                  R.mute ? "  (MUTE)" : "", tocaRx(rx) ? "" : (duas_ ? "\nEste receptor está calado agora (CONFIGURAÇÃO > VFO-B: ouvir os dois)."
+                                                                                     : "\nVale quando este receptor for o ouvido (MAIN/SUB)."));
+            }
+        }
+        // SQL (squelch): -90 = aberto ... +30
+        {
+            const bool fechado = R.sql > -90.f && rx == ativo_ && lig && !sqlAberto_;
+            const ImU32 cs = R.sql <= -90.f ? IM_COL32(0x60, 0x66, 0x70, 255) : fechado ? IM_COL32(0xff, 0x50, 0x40, 255) : IM_COL32(0xff, 0xa0, 0x30, 255);
+            const ImVec2 sz = trilho(xs, (R.sql + 90.f) / 120.f, cs, IM_COL32(0xf4, 0xf4, 0xf6, 255), "SQL");
+            std::snprintf(id, sizeof id, "##sqsl%d", rx);
+            ImGui::InvisibleButton(id, sz);
+            bool mexeu = false;
+            if (ImGui::IsItemActive()) { R.sql = std::round(-90.f + valorDoMouse() * 120.f); mexeu = true; }
+            if (ImGui::IsItemHovered()) {
+                if (io.MouseWheel != 0) { R.sql = std::clamp(R.sql + io.MouseWheel * 2.f, -90.f, 30.f); io.MouseWheel = 0; mexeu = true; }
+                if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) { R.sql = -90.f; mexeu = true; }
+                char sq[48];
+                if (R.sql <= -90.f) std::snprintf(sq, sizeof sq, "aberto"); else std::snprintf(sq, sizeof sq, "%d dB acima do ruído", (int)std::lround(R.sql + 60.f));
+                ImGui::SetTooltip("SQL: squelch do %s - %s%s\nArraste para cima (fecha) / para baixo (abre) ou use a roda do mouse.\nDuplo clique: abre.",
+                                  qual, sq, fechado ? "  (fechado agora)" : "");
+            }
+            if (mexeu) {
+                R.sql = std::clamp(R.sql, -90.f, 30.f);
+                if (rx == ativo_) { sql_ = R.sql; sqlAplicado_ = R.sql; }
+                if (R.sql <= -90.f) sqlAuto_[rx] = false;
+            }
+        }
     }
 }
 

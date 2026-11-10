@@ -61,6 +61,9 @@ Dois aparelhos (um dongle em cada VFO)
    SUB:AF-RF/SQL controla o VFO-B (o anel e RF ou SQL, conforme o MENU > Audio >
    Anel RF/SQL); o MUTE de cada um cala so aquele VFO.
  - XFC segurado: so o outro VFO toca.
+ - Sliders AF e SQL no canto de cada VFO na tela (a esquerda do MAIN, a direita
+   do SUB): volume e squelch daquele receptor, com um aparelho ou com dois.
+   Duplo clique no SQL abre o squelch.
  - Com DUAL, o escopo do VFO-B mostra a janela inteira do aparelho dele.
  - O aparelho do VFO-B liga e desliga junto com o POWER. Se a caixa dele cair, o
    programa avisa e tenta de novo a cada 10 s.

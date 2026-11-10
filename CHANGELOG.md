@@ -1,5 +1,21 @@
 # IC7610SDR - histórico
 
+## 1.1.2 (10/11/2026)
+- Squelch mais sensível em FM, AM e nos outros modos: agora ele mede quanto o sinal passa do ruído de um
+  canal vazio da largura do filtro. Antes o nível tinha um teto em 0 dB e, com o pré-amplificador ou o AGC do
+  dongle, o próprio ruído já batia nesse teto: o squelch que fechava o ruído não abria com sinal nenhum (ex.:
+  DMR em 165 MHz no VFO-B). Na escala nova o ruído fica em -60: SQL -55 = 5 dB acima do ruído, -40 = 20 dB.
+  Vale também para o squelch do outro VFO com dois aparelhos.
+- Quem usava o squelch ligado fica com -50 (10 dB acima do ruído) na primeira vez que abre esta versão.
+- BUSY do outro VFO (com dois aparelhos) agora acende só com o squelch dele aberto (antes acendia com o
+  S-meter acima do ruído, mesmo com o squelch fechado).
+
+## 1.1.1 (10/11/2026)
+- Dígitos das duas frequências da tela menores.
+- No canto de cada VFO (à esquerda do MAIN e à direita do SUB), dois sliders em pé: AF (volume) e SQL (squelch)
+  daquele receptor - arrastar, roda do mouse; duplo clique no SQL abre. Valem com um aparelho ou com dois e em
+  qualquer modo; são os mesmos valores dos botões MAIN:AF-RF/SQL e SUB:AF-RF/SQL.
+
 ## 1.1.0 (10/11/2026)
 - Dois aparelhos: o VFO-B pode ter o seu próprio dongle (RTL-SDR, RTL-TCP ou SDRplay), recebendo ao mesmo tempo
   que o VFO-A - por exemplo um RTL-TCP em HF e outro em VHF. CONFIGURAÇÃO > VFO-B (segundo aparelho): tipo,

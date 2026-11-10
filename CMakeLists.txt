@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(IC7610SDR VERSION 1.1.0 LANGUAGES C CXX)
+project(IC7610SDR VERSION 1.1.2 LANGUAGES C CXX)
 
 # ---------------------------------------------------------------------------
 #  IC7610SDR - receptor SDR com painel de radio (Windows 7 SP1 ate 11)
