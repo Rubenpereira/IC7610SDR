@@ -1,5 +1,16 @@
 # IC7610SDR - histórico
 
+## 1.1.3 (15/11/2026)
+- **ACARS, VDL2 e HFDL em português fácil de ler** (caixinha "Português fácil de ler", ligada): cada mensagem
+  ganha um título ("Relatório de posição (FMS)", "Autorização de saída (PDC)", "Pedido de ATIS", "Relatório de
+  ETA", "Confirmação técnica (sem conteúdo)"...) e os campos explicados: voo com o nome da companhia e o prefixo,
+  posição em graus e minutos, altitude (FL e pés), Mach, rota e aeroportos com o nome da cidade, ETA, combustível,
+  pista, saída (SID), transponder, nível autorizado, último e próximo fixo, enlace perdido / disponível. Mensagem
+  longa em vários blocos vira uma só e as repetidas somem. "Mensagem original" põe embaixo o texto cru.
+- **ADS-B legível**: na caixa de texto, um aviso por avião (voo, companhia, prefixo, modelo, país, altitude subindo
+  / descendo, velocidade em nós e km/h, rumo, transponder, posição), outro quando decola ou pousa e um ALERTA nos
+  códigos 7500, 7600 e 7700.
+
 ## 1.1.2 (10/11/2026)
 - Squelch mais sensível em FM, AM e nos outros modos: agora ele mede quanto o sinal passa do ruído de um
   canal vazio da largura do filtro. Antes o nível tinha um teto em 0 dB e, com o pré-amplificador ou o AGC do

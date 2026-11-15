@@ -246,6 +246,11 @@ ADSB (DECODE > ADSB)
    Taxi aereo, Executiva ou Particular (helicoptero, planador... entram
    entre parenteses). Passe o mouse para ver a categoria do aviao.
  - Squawk 7500/7600/7700 aparece em vermelho e com aviso na caixa de texto.
+ - "Portugues facil de ler" (ADSB, ACARS, VDL2 e HFDL, ligada): a caixa de
+   texto mostra cada aviao / mensagem com um titulo e os campos explicados
+   (voo e companhia, posicao, altitude, rota com o nome dos aeroportos,
+   ETA, autorizacao de saida, transponder...). No ACARS, VDL2 e HFDL a
+   caixinha "Mensagem original" mostra tambem o texto cru embaixo.
  - A tabela e o texto sao um registro: nada some sozinho (quem nao e ouvido
    ha mais de 1 minuto fica apagadinho). O botao Limpar apaga o texto e as
    tabelas. No ADSB, ACARS e VDL2 o som do radio fica mudo (nao serve para

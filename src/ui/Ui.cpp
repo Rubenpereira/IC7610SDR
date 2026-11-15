@@ -245,6 +245,8 @@ Ui::Ui(Radio& radio, Radio& radioB, IDirect3DDevice9* dev, const Fontes& f, floa
     wfSpeed_ = (float)c.dbl("wf_speed", 2);
     wfSpeedEsc_ = (float)c.dbl("wf_speed_esc", wfSpeed_);
     autoWf_ = c.flag("wf_auto", true);
+    decLegivel_ = c.flag("dec_legivel", !emIngles());   // o texto legivel e em portugues
+    decOriginal_ = c.flag("dec_original", false);
     nrEsp_ = c.flag("nr_esp", false);
     nrEspForca_ = (float)c.dbl("nr_esp_forca", 10);
     mudo_ = c.flag("mudo", false);
@@ -5186,6 +5188,7 @@ void Ui::janelaDecoders()
     ImGui::SameLine();
     if (ImGui::Button(T("Limpar"))) {
         decTexto_.clear(); decCol_ = 0; decLinhas_ = 0; ft8Msgs_.clear(); ft8Extra_.clear();
+        decBloco_.clear(); decPend_.clear(); decPedaco_.clear(); decRecentes_.clear(); adsbAvisos_.clear();
         // as tabelas de avioes sao registro: so o Limpar apaga
         d.adsb().limparLista(); d.adsbRede().core().limparLista(); d.acars().limparLista(); d.vdl2().limparLista(); d.hfdl().limparLista();
     }
@@ -5500,6 +5503,7 @@ void Ui::janelaDecoders()
         break;
     }
     case Decoders::HFDL: {
+        opcoesLegivel();
         ImGui::AlignTextToFramePadding();
         ImGui::TextUnformatted(T("Banda")); ImGui::SameLine();
         ImGui::SetNextItemWidth(wCombo);
@@ -5791,12 +5795,14 @@ void Ui::janelaDecoders()
         botaoRadar();
         ImGui::TextDisabled(T("131,550 e 131,825 MHz ao mesmo tempo (AM). O rádio fica com o centro no meio dos dois;"));
         ImGui::TextDisabled(T("não mexa na sintonia enquanto ouve. Voo e prefixo abrem no FlightAware."));
+        opcoesLegivel();
         tabelaAvioes("##avacars", d.acars().aeronaves());
         break;
     case Decoders::VDL2:
         botaoRadar();
         ImGui::TextDisabled(T("136,975 MHz (VDL modo 2, 31,5 kbit/s). O dongle passa para 1,05 Msps enquanto ouve."));
         ImGui::TextDisabled(T("Não mexa na sintonia enquanto ouve. Voo e prefixo abrem no FlightAware."));
+        opcoesLegivel();
         tabelaAvioes("##avvdl2", d.vdl2().aeronaves());
         break;
     case Decoders::ADSB: {
@@ -5808,6 +5814,7 @@ void Ui::janelaDecoders()
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip(T("O ADS-B traz só o código ICAO do avião; a matrícula (PR-XXX, PP-XXX...) vem do hexdb.io.\nCada avião é consultado uma vez e fica guardado em adsb_prefixos.txt ao lado do programa.\nOs dos EUA (N...) são calculados direto do código, sem internet."));
         if (decAj_.adsbInternet) { ImGui::SameLine(); ImGui::TextDisabled("(%s)", d.adsbInternet().c_str()); }
+        opcoesLegivel();
         tabelaAdsb(d.adsb().avioes());
         break;
     }
@@ -5912,7 +5919,19 @@ void Ui::janelaDecoders()
 
     // --- texto ---
     const std::string novo = d.pegarTexto();
-    if (!novo.empty()) anexarDecTexto(novo);
+    if (!novo.empty()) textoDecoder(novo);
+    if (decAviao()) fecharBlocoAviao(false);          // bloco parado ha 1,2 s / mensagem de varios blocos parada ha 15 s
+    if (decTipo_ == Decoders::ADSB) {
+        // o dongle e o receptor da rede interna (Feeder, Configuracao): o mesmo aviao so uma vez
+        auto avs = d.adsb().avioes();
+        if (d.adsbRede().conectado())
+            for (auto& a : d.adsbRede().core().avioes()) {
+                bool ja = false;
+                for (const auto& b : avs) if (b.hex == a.hex) { ja = true; break; }
+                if (!ja) avs.push_back(std::move(a));
+            }
+        avisosAdsb(avs);
+    }
     bool chegouFt8 = false;
     for (auto& m : d.pegarFt8()) { ft8Chegou(std::move(m)); chegouFt8 = true; }
     if (ft8Msgs_.size() > 5000) {

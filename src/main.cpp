@@ -186,7 +186,7 @@ ImFont* fonte(const char* arquivo, float px)
     ImGuiIO& io = ImGui::GetIO();
     // Latim (acentos) + "…" (U+2026) + "●" (U+25CF, do GRAVANDO)
     // + "▲"/"▼" (U+25B2/25BC, da barra de satelites minimizada)
-    static const ImWchar faixas[] = {0x0020, 0x00FF, 0x2014, 0x2014, 0x2026, 0x2026, 0x25B2, 0x25B2, 0x25BC, 0x25BC, 0x25CB, 0x25CB, 0x25CF, 0x25CF, 0};
+    static const ImWchar faixas[] = {0x0020, 0x00FF, 0x2014, 0x2014, 0x2026, 0x2026, 0x2190, 0x2193, 0x25B2, 0x25B2, 0x25BC, 0x25BC, 0x25CB, 0x25CB, 0x25CF, 0x25CF, 0};
     if (GetFileAttributesA(p.c_str()) != INVALID_FILE_ATTRIBUTES)
         return io.Fonts->AddFontFromFileTTF(p.c_str(), px, nullptr, faixas);
     ImFontConfig cfg; cfg.SizePixels = px;

@@ -12,6 +12,8 @@ O rádio em 940 kHz (AM) com os dois S-meters, o escopo DUAL e a cachoeira. *Cli
 
 ## Radar Aéreo
 
+**ACARS, VDL2, HFDL e ADS-B em português fácil de ler:** cada mensagem aparece com um título ("Relatório de posição (FMS)", "Autorização de saída (PDC)", "Pedido de ATIS", "Relatório de ETA"...) e os campos explicados: voo e companhia, posição, altitude, rota e aeroportos com o nome da cidade, ETA, pista, saída, transponder. A caixinha "Mensagem original" mostra também o texto cru.
+
 Tela de radar em tela cheia, com a agulha girando 360°, que mostra os aviões que o dongle está ouvindo pelo **ADSB, ACARS, VDL2 e HFDL**. Mostra também as estações de terra do HFDL que transmitiram e a posição pela internet (adsb.lol) de quem foi ouvido sem posição. O alcance vai de 10 km até o planeta inteiro.
 
 ## Download

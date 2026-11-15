@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(IC7610SDR VERSION 1.1.2 LANGUAGES C CXX)
+project(IC7610SDR VERSION 1.1.3 LANGUAGES C CXX)
 
 # ---------------------------------------------------------------------------
 #  IC7610SDR - receptor SDR com painel de radio (Windows 7 SP1 ate 11)
@@ -43,6 +43,7 @@ set(SOURCES
     src/app/Dsd.cpp
     src/app/Tetra.cpp
     src/app/Externos.cpp
+    src/app/AcarsLegivel.cpp
     src/decoders/CwCore.cpp
     src/decoders/RttyCore.cpp
     src/decoders/SitorBCore.cpp
@@ -75,6 +76,7 @@ set(SOURCES
     src/ui/Idioma.cpp
     src/ui/Satelites.cpp
     src/ui/Radar.cpp
+    src/ui/UiAvioes.cpp
     src/ui/Ft8Pais.cpp
     src/sat/Rastreador.cpp
     src/sat/SatCatalogo.cpp

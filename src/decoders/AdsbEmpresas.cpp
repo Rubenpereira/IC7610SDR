@@ -24,7 +24,7 @@ const Companhia kCompanhias[] = {
     {"ARG", "Aerolíneas Argentinas", 'P'},    {"AVA", "Avianca", 'P'},
     {"TAI", "Avianca El Salvador", 'P'},      {"LRC", "Avianca Costa Rica", 'P'},
     {"CMP", "Copa Airlines", 'P'},            {"SKU", "Sky Airline", 'P'},
-    {"JAT", "JetSMART", 'P'},                 {"FBZ", "Flybondi", 'P'},
+    {"JAT", "JetSMART", 'P'},                 {"JES", "JetSMART Argentina", 'P'},                 {"FBZ", "Flybondi", 'P'},
     {"AMX", "Aeroméxico", 'P'},               {"VIV", "Viva Aerobus", 'P'},
     {"VOI", "Volaris", 'P'},                  {"BOV", "Boliviana de Aviación", 'P'},
     // America do Norte
@@ -263,7 +263,7 @@ std::string vooParaIcao(const std::string& vooIn, const std::string& prefixo)
     // brasileira (PR/PP/PT/PS/PU), LAN nas outras.
     struct Par { const char* iata; const char* icao; };
     static const Par kIata[] = {
-        {"G3", "GLO"}, {"AD", "AZU"}, {"JJ", "TAM"}, {"2Z", "PTB"}, {"M3", "TUS"}, {"H2", "SKU"}, {"JA", "JAT"},
+        {"G3", "GLO"}, {"AD", "AZU"}, {"JJ", "TAM"}, {"2Z", "PTB"}, {"M3", "TUS"}, {"H2", "SKU"}, {"JA", "JAT"}, {"WJ", "JES"},
         {"XL", "LNE"}, {"LP", "LPE"}, {"PZ", "LAP"}, {"OB", "BOV"}, {"Z8", "AZN"}, {"AR", "ARG"}, {"CM", "CMP"},
         {"AV", "AVA"}, {"AM", "AMX"}, {"AA", "AAL"}, {"UA", "UAL"}, {"DL", "DAL"}, {"AC", "ACA"}, {"WS", "WJA"},
         {"B6", "JBU"}, {"AS", "ASA"}, {"WN", "SWA"}, {"NK", "NKS"}, {"F9", "FFT"}, {"AF", "AFR"}, {"KL", "KLM"},

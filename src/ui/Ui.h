@@ -9,6 +9,8 @@
 //  OpenWebRX+.
 // ---------------------------------------------------------------------------
 #include <atomic>
+#include <deque>
+#include <map>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -73,6 +75,13 @@ private:
     void janelaSobre();
     void janelaDecoders();
     void anexarDecTexto(const std::string& novo);
+    // ACARS / VDL2 / HFDL / ADS-B em portugues facil de ler (UiAvioes.cpp)
+    void textoDecoder(const std::string& novo);
+    void fecharBlocoAviao(bool agora, bool tudo = false);
+    void mensagemAviao(std::string bloco);
+    void avisosAdsb(const std::vector<AdsbCore::Aviao>& avs);
+    void opcoesLegivel();
+    bool decAviao() const;
     void devolverModo();
     bool decModoGuardado_ = false;
     std::string decModoAntes_;
@@ -289,6 +298,12 @@ private:
     bool decRodando_ = false, decSelTudo_ = false;
     int  decSelPend_ = 0, decSelFeito_ = 0;
     int  decCol_ = 0, decLinhas_ = 0;
+    bool decLegivel_ = true, decOriginal_ = false;   // mensagens de aviao em portugues / com a original embaixo
+    std::string decPedaco_, decBloco_, decPend_, decPendChave_;
+    double decBlocoT_ = 0, decPendT_ = 0, adsbAvisosT_ = 0;
+    std::deque<std::pair<std::string, double>> decRecentes_;
+    struct AvisoAdsb { bool anunciado = false, semVoo = false; int squawk = -1, chao = -1; double t = 0; };
+    std::map<std::string, AvisoAdsb> adsbAvisos_;
     int decCanalRtty_ = -1, decCanalSitor_ = -1, decCanalDsc_ = -1, decCanalAle_ = -1, decCanalPactor_ = -1;
     int decCanalOlivia_ = -1;
     int decCanalSelcall_ = -1;
